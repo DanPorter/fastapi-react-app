@@ -1,0 +1,13 @@
+How to run fastapi-react-app
+
+Terminal 1:
+$ conda activate myreact
+$ cd fastapi-react-app/backend
+$ fastapi dev main.py
+
+Terminal 2:
+$ conda activate myreact
+$ cd fastapi-react-app/frontend
+$ pnpm run dev
+build frontend:
+$ pnpm build 
