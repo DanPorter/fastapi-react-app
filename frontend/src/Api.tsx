@@ -3,6 +3,11 @@
 interface apiGet {
   response: string,
   list: string[],
+  xdata: [],
+  ydata: [],
+  xlabel: string,
+  ylabel: string,
+  data: {}
 }
   
 interface apiSenderProps {

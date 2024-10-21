@@ -9,22 +9,23 @@ import Tab from '@mui/material/Tab';
 
 
 interface apiGetVisitProps {
-  instrument: string;
-  year: string;
+  instrument: string | null;
+  year: string | null;
   set_dict: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   set_list: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 function apiGetVisits(props: apiGetVisitProps) {
   return async () => {
+    console.log('fetch:', "/api/" + props.instrument + "/" + props.year)
     const res = await fetch("/api/" + props.instrument + "/" + props.year, {
       method: 'GET'
     });
-    console.log(res)
+    console.log('response:', res)
     const data = await res.json();
-    console.log(data)
+    console.log('json data:', data)
     props.set_dict(data)
-    props.set_list(data.keys())
+    props.set_list(data.keys)
   };
 };
 
@@ -67,12 +68,12 @@ function TabVisit(props: tabProps) {
   const [year, setYear] = useState(years[-1]);
   const instruments = ['I06-1', 'I06-2', 'I10-1', 'I10-2', 'I16', 'I21']
 
-  const getVisits = apiGetVisits({
-    instrument: instrument,
-    year: year,
-    set_dict: setVisits,
-    set_list: setVisitList,
-  })
+  // const getVisits = apiGetVisits({
+  //   instrument: instrument,
+  //   year: year,
+  //   set_dict: setVisits,
+  //   set_list: setVisitList,
+  // })
 
   function setDatadir(visitName: string) {
     if (visitName in {visits}) {
@@ -94,7 +95,15 @@ function TabVisit(props: tabProps) {
         inputValue={instrument}
         onInputChange={(_event, newInputValue) => {
           setInstrument(newInputValue);
-          {getVisits()};
+        }}
+        onChange={(_e, value) => {
+          console.log('apiGetVisits')
+          apiGetVisits({
+            instrument: value,
+            year: year,
+            set_dict: setVisits,
+            set_list: setVisitList,
+          })()
         }}
         renderInput={(params: object) => (
           <TextField
@@ -116,7 +125,14 @@ function TabVisit(props: tabProps) {
         inputValue={year}
         onInputChange={(_event, newInputValue) => {
           setYear(newInputValue);
-          {getVisits()};
+        }}
+        onChange={(_e, value) => {
+          apiGetVisits({
+            instrument: instrument,
+            year: value,
+            set_dict: setVisits,
+            set_list: setVisitList,
+          })()
         }}
         renderInput={(params: object) => (
           <TextField

@@ -35,20 +35,18 @@ async def get_visits(instrument: str, year: str):
 @app.post("/api/get-last-scan/")
 async def get_last_scan(message: GetScan):
     logger.info('Get latest file')
-    # extension = os.path.splitext(message.filespec)[-1]
-    extension = '.nxs'
-    latest_file = get_latest_file(message.datadir, extension)
+    latest_file = get_latest_file(message.datadir)
     logger.debug(f"Latest file: {latest_file}")
     # scanno = nexus_scan_number(latest_file)
     # logger.debug(f"Latest Scanno = {scanno}")
-    return {"response": latest_file.name}
+    return {"response": latest_file}
 
 
 @app.post("/api/get-all-scans/")
 async def get_all_scans(message: GetScan):
     logger.info('Get all scan files')
     extension = '.nxs'
-    return {"list": list_scan_files(message.datadir, extension)}
+    return {"list": [p.name for p in list_scan_files(message.datadir, extension)]}
 
 
 @app.post("/api/get-scan-format/")

@@ -17,8 +17,8 @@ def list_scan_files(directory: str, extension='.nxs') -> list[str]:
     """Return list of files in directory with extension, returning list of full file paths"""
     try:
         return sorted(
-            (file.name for file in os.scandir(directory) if file.is_file() and file.name.endswith(extension)),
-            key=lambda x: os.path.getmtime(x)
+            (file for file in os.scandir(directory) if file.is_file() and file.name.endswith(extension)),
+            key=os.path.getmtime
         )
     except FileNotFoundError:
         return []
@@ -26,19 +26,23 @@ def list_scan_files(directory: str, extension='.nxs') -> list[str]:
 
 def get_dls_visits(instrument: str, year: str) -> dict[str]:
     """Return list of visits"""
-    dls_dir = os.path.join('/dls', instrument, 'data', year)
+    dls_dir = os.path.join('/dls', instrument.lower(), 'data', year)
+    logger.debug(f"dls_dir = {dls_dir}")
     if os.path.isdir(dls_dir):
         return {p.name: p.path for p in os.scandir(dls_dir) if p.is_dir()}
     logger.warning(f"Path '{dls_dir}' does not exist")
     return {}
 
 
-def get_latest_file(directory: str, extension='.nxs') -> os.DirEntry:
+def get_latest_file(directory: str, extension='.nxs') -> str:
     """Return latest file in directory"""
-    return max(
-        (p for p in os.scandir(directory) if p.name.endswith(extension)), 
-        key=os.path.getmtime
-    )
+    try:
+        return max(
+            (p for p in os.scandir(directory) if p.name.endswith(extension)), 
+            key=os.path.getmtime
+        ).name
+    except (ValueError, FileNotFoundError):
+        return ''
 
 
 def nexus_scan_number(filename: str) -> int:

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import FolderChooser from './FolderChoice'
 import MetadataTabs from './MetadataFormatTabs';
-import { Plots, PlotDataGetter } from './Plots';
+import { Plots } from './Plots';
 import AxisChooser from './AxisChoice';
 import ScanChooser from './ScanChoice';
 import apiSender from './Api';
@@ -39,20 +39,23 @@ export function GetHdfMap() {
     inputs: {datadir: datadir, filename: scanFile, format: format, xaxis: '', yaxis: ''}, 
     setter: [(data) => setResponse(data.response)]
   })
-  const getPlotData = PlotDataGetter({
-    datadir: datadir,
-    filename: scanFile,
-    xaxis: xAxis,
-    yaxis: yAxis,
-    format: format,
-    setters: [
+  const getPlotData = apiSender({
+    hostname: '/api/get-scan-data/'  ,
+    inputs: {
+      datadir: datadir, 
+      filename: scanFile, 
+      format: format, 
+      xaxis: xAxis, 
+      yaxis: yAxis
+    }, 
+    setter: [
       (data) => setXdata(data.xdata),
       (data) => setYdata(data.ydata),
       (data) => setXlabel(data.xlabel),
       (data) => setYlabel(data.ylabel),
       (data) => setAxesOptions(Object.keys(data.data))
-    ],
-  });
+    ]
+  })
  
   function loadData() {
     getMetadata();
