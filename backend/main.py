@@ -1,3 +1,11 @@
+"""
+No longer used!
+
+Still here just to keep the comments
+
+Look at hdfmap_api.fastapi_hdfmap instead
+"""
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
