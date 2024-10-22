@@ -11,3 +11,25 @@ $ cd fastapi-react-app/frontend
 $ pnpm run dev
 build frontend:
 $ pnpm build 
+
+
+
+
+Installation on linux 16/Oct/24
+cd /scratch/grp66007/
+mkdir web
+   cd web
+   conda create -n myreactenv nodejs python pnpm 
+   conda activate myreactenv
+   python -m pip install hdfmap fastapi[standard]
+   git clone https://github.com/DanPorter/fastapi-react-app.git
+   cd fastapi-react-app
+   cd frontend/
+   pnpm install
+   pnpm install remarkable
+   pnpm install @types/remarkable
+   pnpm build
+   cd ../backend/
+   fastapi dev main.py
+   
+
