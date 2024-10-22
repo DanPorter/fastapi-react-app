@@ -7,12 +7,12 @@ interface apiGet {
   ydata: [],
   xlabel: string,
   ylabel: string,
-  data: {}
+  data: object,
 }
   
 interface apiSenderProps {
   hostname: string;
-  inputs: any;
+  inputs: object;
   setter: Array<(event: apiGet) => void>;
 };
   
@@ -29,7 +29,29 @@ export default function apiSender(props: apiSenderProps) {
     const data = await res.json();
     console.log(data)
     for (let i = 0; i < props.setter.length; i++) {
-    props.setter[i](data);
+      props.setter[i](data);
     }
+  };
+};
+
+
+interface apiGetVisitProps {
+  instrument: string | null;
+  year: string | null;
+  set_dict: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  set_list: React.Dispatch<React.SetStateAction<string[]>>;
+};
+
+export function apiGetVisits(props: apiGetVisitProps) {
+  return async () => {
+    console.log('fetch:', "/api/" + props.instrument + "/" + props.year)
+    const res = await fetch("/api/" + props.instrument + "/" + props.year, {
+      method: 'GET'
+    });
+    console.log('response:', res)
+    const data = await res.json();
+    console.log('json data:', data)
+    props.set_dict(data)
+    props.set_list(Object.keys(data))
   };
 };

@@ -7,33 +7,14 @@ import TextField from '@mui/material/TextField';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 
-
-interface apiGetVisitProps {
-  instrument: string | null;
-  year: string | null;
-  set_dict: React.Dispatch<React.SetStateAction<Record<string, string>>>;
-  set_list: React.Dispatch<React.SetStateAction<string[]>>;
-};
-
-function apiGetVisits(props: apiGetVisitProps) {
-  return async () => {
-    console.log('fetch:', "/api/" + props.instrument + "/" + props.year)
-    const res = await fetch("/api/" + props.instrument + "/" + props.year, {
-      method: 'GET'
-    });
-    console.log('response:', res)
-    const data = await res.json();
-    console.log('json data:', data)
-    props.set_dict(data)
-    props.set_list(Object.keys(data))
-  };
-};
+import { apiGetVisits } from './Api';
+import apiSender from './Api';
 
 
 interface tabProps {
   datadir: string;
   setDatadir: React.Dispatch<React.SetStateAction<string>>;
-  getScans: () => Promise<void>;
+  setScans: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 
@@ -47,9 +28,15 @@ function TabFolders(props: tabProps) {
         value={props.datadir}
         onChange={(e) => props.setDatadir(e.target.value)}
         onKeyDown={(ev) => {
-          // console.log(`Pressed keyCode ${ev.key}`);
+          console.log(`Pressed keyCode ${ev.key}`);
           if (ev.key === 'Enter') {
-            props.getScans();
+            apiSender({
+              hostname: '/api/get-all-scans/',
+              // inputs: { datadir: props.datadir},
+              inputs: { datadir: props.datadir, filename: '', format: '', xaxis: '', yaxis: '' },
+              setter: [(data) => props.setScans(data.list)]
+            })();
+            // props.getScans();
             // ev.preventDefault();
           }
         }}
@@ -68,18 +55,16 @@ function TabVisit(props: tabProps) {
   const [year, setYear] = useState(years[-1]);
   const instruments = ['I06-1', 'I06-2', 'I10-1', 'I10-2', 'I16', 'I21']
 
-  // const getVisits = apiGetVisits({
-  //   instrument: instrument,
-  //   year: year,
-  //   set_dict: setVisits,
-  //   set_list: setVisitList,
-  // })
-
-  function setDatadir(visitName: string | null, visitList: string[]) {
-    console.log('setDatadir:', visitName, (visitName && visitList.includes(visitName)))
+  function datadirUpdate(visitName: string | null, visitList: string[]) {
+    console.log('datadirUpdate:', visitName, (visitName && visitList.includes(visitName)))
     if (visitName && visitList.includes(visitName)) {
       props.setDatadir(visits[visitName]);
-      props.getScans();
+      apiSender({
+        hostname: '/api/get-all-scans/',
+        // inputs: { datadir: visits[visitName] },
+        inputs: { datadir: visits[visitName], filename: '', format: '', xaxis: '', yaxis: '' },
+        setter: [(data) => props.setScans(data.list)]
+      })();
     }
   }
 
@@ -102,7 +87,7 @@ function TabVisit(props: tabProps) {
               year: year,
               set_dict: setVisits,
               set_list: setVisitList,
-            })()
+            })() // why do I need this?
           }}
           renderInput={(params: object) => (
             <TextField
@@ -156,7 +141,7 @@ function TabVisit(props: tabProps) {
           }}
           onChange={(_event, value) => {
             console.log('visit onChange', value)
-            setDatadir(value, visitList);
+            datadirUpdate(value, visitList);
           }}
           renderInput={(params: object) => (
             <TextField
@@ -215,11 +200,11 @@ export default function FolderChooser(props: tabProps) {
       </Box>
       
       <CustomTabPanel value={tabValue} index={2}>
-        <TabFolders datadir={props.datadir} setDatadir={props.setDatadir} getScans={props.getScans}/>
+        <TabFolders datadir={props.datadir} setDatadir={props.setDatadir} setScans={props.setScans}/>
       </CustomTabPanel>
 
       <CustomTabPanel value={tabValue} index={1}>
-        <TabVisit datadir={props.datadir} setDatadir={props.setDatadir} getScans={props.getScans}/>
+        <TabVisit datadir={props.datadir} setDatadir={props.setDatadir} setScans={props.setScans}/>
       </CustomTabPanel>
     </>
   );  

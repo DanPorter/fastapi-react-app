@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
 
-from .functions import list_scan_files, get_latest_file, nexus_scan_number, get_dls_visits
+from .functions import list_scan_files, get_latest_file, get_dls_visits
 
 
 app = FastAPI()
@@ -25,11 +25,17 @@ class GetScan(BaseModel):
     xaxis: str 
     yaxis: str
 
+# mutable memory
+VISITS = {}
+SCANS = {}
+
 
 @app.get("/api/{instrument}/{year}")
 async def get_visits(instrument: str, year: str):
-    logger.info(f"Getting visits from /dls/{instrument}/data/{year}")
-    return get_dls_visits(instrument, year)
+    if (key := instrument + year) not in VISITS:
+        logger.info(f"Getting visits from /dls/{instrument}/data/{year}")
+        VISITS[key] = get_dls_visits(instrument, year)
+    return VISITS[key]
 
 
 @app.post("/api/get-last-scan/")
@@ -44,9 +50,12 @@ async def get_last_scan(message: GetScan):
 
 @app.post("/api/get-all-scans/")
 async def get_all_scans(message: GetScan):
-    logger.info('Get all scan files')
-    extension = '.nxs'
-    return {"list": [p.name for p in list_scan_files(message.datadir, extension)]}
+    if message.datadir not in SCANS:
+        logger.info(f"Get all scan files from '{message.datadir}'")
+        SCANS[message.datadir] = [p.name for p in list_scan_files(message.datadir)]
+    else:
+        logger.info(f"scans from memory: {message.datadir}")
+    return {"list": SCANS[message.datadir]}
 
 
 @app.post("/api/get-scan-format/")
@@ -94,6 +103,7 @@ async def get_scan_data(message: GetScan):
                 axes_data = nxmap.eval(hdf, axes_name)
                 signal_data = nxmap.eval(hdf, signal_name)
                 scan_data = nxmap.get_scannables(hdf)
+                rsp = nxmap.format_hdf(hdf, message.format)
             
             if not issubclass(type(axes_data), np.ndarray) or not np.issubdtype(axes_data.dtype, np.number) or len(axes_data) != nxmap.scannables_length():
                 axes_name = '![fail]' + axes_name
@@ -107,7 +117,8 @@ async def get_scan_data(message: GetScan):
             response['ylabel'] = signal_name
             response['xdata'] = axes_data.tolist()
             response['ydata'] = signal_data.tolist()
-            response['response'] = f"x={axes_name}, y={signal_name}, scan length={len(scan_data[signal_name])}"
+            # response['response'] = f"x={axes_name}, y={signal_name}, scan length={len(scan_data[signal_name])}"
+            response['response'] = rsp
         except Exception as ex:
             response['response'] = str(ex)
     else:

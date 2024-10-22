@@ -29,16 +29,16 @@ export function GetHdfMap() {
     inputs: { datadir: datadir, filename: '', format: '', xaxis: '', yaxis: '' },
     setter: [(data) => setScanFile(data.response)]
   })
-  const allScans = apiSender({
-    hostname: '/api/get-all-scans/',
-    inputs: { datadir: datadir, filename: '', format: '', xaxis: '', yaxis: '' },
-    setter: [(data) => setScanFiles(data.list)]
-  })
-  const getMetadata = apiSender({
-    hostname: '/api/get-scan-format/' ,
-    inputs: {datadir: datadir, filename: scanFile, format: format, xaxis: '', yaxis: ''}, 
-    setter: [(data) => setResponse(data.response)]
-  })
+  // const allScans = apiSender({
+  //   hostname: '/api/get-all-scans/',
+  //   inputs: { datadir: datadir, filename: '', format: '', xaxis: '', yaxis: '' },
+  //   setter: [(data) => setScanFiles(data.list)]
+  // })
+  // const getMetadata = apiSender({
+  //   hostname: '/api/get-scan-format/' ,
+  //   inputs: {datadir: datadir, filename: scanFile, format: format, xaxis: '', yaxis: ''}, 
+  //   setter: [(data) => setResponse(data.response)]
+  // })
   const getPlotData = apiSender({
     hostname: '/api/get-scan-data/'  ,
     inputs: {
@@ -49,6 +49,7 @@ export function GetHdfMap() {
       yaxis: yAxis
     }, 
     setter: [
+      (data) => setResponse(data.response),
       (data) => setXdata(data.xdata),
       (data) => setYdata(data.ydata),
       (data) => setXlabel(data.xlabel),
@@ -58,7 +59,7 @@ export function GetHdfMap() {
   })
  
   function loadData() {
-    getMetadata();
+    // getMetadata();
     getPlotData();
   }
 
@@ -68,7 +69,7 @@ export function GetHdfMap() {
       <Grid size={6}> 
         <Grid container spacing={2} columns={12}>
           <Grid size={12}>
-            <FolderChooser datadir={datadir} setDatadir={setDatadir} getScans={allScans}/>
+            <FolderChooser datadir={datadir} setDatadir={setDatadir} setScans={setScanFiles}/>
           </Grid>
 
           <Grid size={12}>

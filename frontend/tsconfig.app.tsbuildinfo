@@ -1,1 +1,1 @@
-{"root":["./src/api.tsx","./src/app.tsx","./src/axischoice.tsx","./src/folderchoice.tsx","./src/markdowntextbox.tsx","./src/metadataformattabs.tsx","./src/plots.tsx","./src/scanchoice.tsx","./src/hdfmap_components.tsx","./src/hdfmap_form.tsx","./src/main.tsx","./src/vite-env.d.ts"],"version":"5.6.2"}
+{"root":["./src/Api.tsx","./src/App.tsx","./src/AxisChoice.tsx","./src/FolderChoice.tsx","./src/MarkdownTextBox.tsx","./src/MetadataFormatTabs.tsx","./src/Plots.tsx","./src/ScanChoice.tsx","./src/hdfmap_components.tsx","./src/main.tsx","./src/vite-env.d.ts"],"version":"5.6.2"}
