@@ -25,7 +25,7 @@ function apiGetVisits(props: apiGetVisitProps) {
     const data = await res.json();
     console.log('json data:', data)
     props.set_dict(data)
-    props.set_list(data.keys)
+    props.set_list(Object.keys(data))
   };
 };
 
@@ -75,95 +75,98 @@ function TabVisit(props: tabProps) {
   //   set_list: setVisitList,
   // })
 
-  function setDatadir(visitName: string) {
-    if (visitName in {visits}) {
-      props.setDatadir('/dls/' + {instrument} + '/data/' + {year} + '/' + visitName);
+  function setDatadir(visitName: string | null, visitList: string[]) {
+    console.log('setDatadir:', visitName, (visitName && visitList.includes(visitName)))
+    if (visitName && visitList.includes(visitName)) {
+      props.setDatadir(visits[visitName]);
       props.getScans();
-    } else {
-      console.log(visitName)
     }
   }
 
   return (
     <Grid container spacing={2} columns={12}>
       <Grid size={4}>
-      <Autocomplete
-        id="instrument"
-        freeSolo
-        autoSelect
-        options={instruments}
-        inputValue={instrument}
-        onInputChange={(_event, newInputValue) => {
-          setInstrument(newInputValue);
-        }}
-        onChange={(_e, value) => {
-          console.log('apiGetVisits')
-          apiGetVisits({
-            instrument: value,
-            year: year,
-            set_dict: setVisits,
-            set_list: setVisitList,
-          })()
-        }}
-        renderInput={(params: object) => (
-          <TextField
-            {...params}
-            label="Instrument"
-            margin="normal"
-            variant="outlined"
-          />
-        )}
-      />
+        <Autocomplete
+          id="instrument"
+          freeSolo
+          autoSelect
+          options={instruments}
+          inputValue={instrument}
+          onInputChange={(_event, newInputValue) => {
+            setInstrument(newInputValue);
+          }}
+          onChange={(_e, value) => {
+            console.log('apiGetVisits')
+            apiGetVisits({
+              instrument: value,
+              year: year,
+              set_dict: setVisits,
+              set_list: setVisitList,
+            })()
+          }}
+          renderInput={(params: object) => (
+            <TextField
+              {...params}
+              label="Instrument"
+              margin="normal"
+              variant="outlined"
+            />
+          )}
+        />
       </Grid>
 
       <Grid size={4}>
-      <Autocomplete
-        id="year"
-        freeSolo
-        autoSelect
-        options={years}
-        inputValue={year}
-        onInputChange={(_event, newInputValue) => {
-          setYear(newInputValue);
-        }}
-        onChange={(_e, value) => {
-          apiGetVisits({
-            instrument: instrument,
-            year: value,
-            set_dict: setVisits,
-            set_list: setVisitList,
-          })()
-        }}
-        renderInput={(params: object) => (
-          <TextField
-            {...params}
-            label="Year"
-            margin="normal"
-            variant="outlined"
-          />
-        )}
-      />
+        <Autocomplete
+          id="year"
+          freeSolo
+          autoSelect
+          options={years}
+          defaultValue={years[0]}
+          inputValue={year}
+          onInputChange={(_event, newInputValue) => {
+            setYear(newInputValue);
+          }}
+          onChange={(_e, value) => {
+            apiGetVisits({
+              instrument: instrument,
+              year: value,
+              set_dict: setVisits,
+              set_list: setVisitList,
+            })()
+          }}
+          renderInput={(params: object) => (
+            <TextField
+              {...params}
+              label="Year"
+              margin="normal"
+              variant="outlined"
+            />
+          )}
+        />
       </Grid>
 
       <Grid size={4}>
-      <Autocomplete
-        id="visit"
-        autoSelect
-        options={visitList}
-        inputValue={visit}
-        onInputChange={(_event, newInputValue) => {
-          setVisit(newInputValue);
-          setDatadir(newInputValue);
-        }}
-        renderInput={(params: object) => (
-          <TextField
-            {...params}
-            label="Visit"
-            margin="normal"
-            variant="outlined"
-          />
-        )}
-      />
+        <Autocomplete
+          id="visit"
+          autoSelect
+          options={visitList}
+          inputValue={visit}
+          onInputChange={(_event, newInputValue) => {
+            setVisit(newInputValue);
+          }}
+          onChange={(_event, value) => {
+            console.log('visit onChange', value)
+            setDatadir(value, visitList);
+          }}
+          renderInput={(params: object) => (
+            <TextField
+              {...params}
+              label="Visit"
+              margin="normal"
+              variant="outlined"
+            />
+          )}
+        />
       </Grid>
   </Grid>
   )
