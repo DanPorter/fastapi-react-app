@@ -39,6 +39,7 @@ export function GetHdfMap() {
   //   inputs: {datadir: datadir, filename: scanFile, format: format, xaxis: '', yaxis: ''}, 
   //   setter: [(data) => setResponse(data.response)]
   // })
+  
   const getPlotData = apiSender({
     hostname: '/api/get-scan-data/'  ,
     inputs: {
@@ -58,10 +59,10 @@ export function GetHdfMap() {
     ]
   })
  
-  function loadData() {
-    // getMetadata();
-    getPlotData();
-  }
+  // function loadData() {
+  //   // getMetadata();
+  //   getPlotData();
+  // }
 
   return (
     <Container maxWidth="xl">
@@ -78,7 +79,7 @@ export function GetHdfMap() {
               setFilename={setScanFile}
               filenames={scanFiles}
               latest={lastScan}
-              load={loadData}
+              load={getPlotData}
             />
           </Grid>
           

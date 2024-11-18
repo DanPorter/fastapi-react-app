@@ -17,13 +17,15 @@ interface apiSenderProps {
 };
   
 export default function apiSender(props: apiSenderProps) {
-  return async () => {
+  // console.log('Creating apiSender to host: ', props.hostname, ' with inputs ', props.inputs)
+  return async (inputInjector: object = {}) => {
+    console.log('running apiSender to host: ', props.hostname, 'inputs:', props.inputs)
     const res = await fetch(props.hostname, {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json',
     },
-    body: JSON.stringify(props.inputs),
+    body: JSON.stringify(Object.assign(props.inputs, inputInjector)),
     });
     console.log(res)
     const data = await res.json();
@@ -31,6 +33,7 @@ export default function apiSender(props: apiSenderProps) {
     for (let i = 0; i < props.setter.length; i++) {
       props.setter[i](data);
     }
+    console.log('Completed apiSender to host: ', props.hostname)
   };
 };
 

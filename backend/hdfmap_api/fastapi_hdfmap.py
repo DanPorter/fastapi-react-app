@@ -105,10 +105,10 @@ async def get_scan_data(message: GetScan):
                 scan_data = nxmap.get_scannables(hdf)
                 rsp = nxmap.format_hdf(hdf, message.format)
             
-            if not issubclass(type(axes_data), np.ndarray) or not np.issubdtype(axes_data.dtype, np.number) or len(axes_data) != nxmap.scannables_length():
+            if not issubclass(type(axes_data), np.ndarray) or not np.issubdtype(axes_data.dtype, np.number) or np.size(axes_data) != nxmap.scannables_length():
                 axes_name = '![fail]' + axes_name
                 axes_data = np.arange(nxmap.scannables_length())
-            if not issubclass(type(signal_data), np.ndarray) or not np.issubdtype(signal_data.dtype, np.number) or len(signal_data) != nxmap.scannables_length():
+            if not issubclass(type(signal_data), np.ndarray) or not np.issubdtype(signal_data.dtype, np.number) or np.size(signal_data) != nxmap.scannables_length():
                 signal_name = '![fail]' + signal_name
                 signal_data = np.ones(nxmap.scannables_length())
 

@@ -11,7 +11,7 @@ interface ScanProps {
   setFilename: (value: React.SetStateAction<string>) => void,
   filenames: string[],
   latest: () => Promise<void>,
-  load: () => void,
+  load: (inputInjector?: object) => Promise<void>,
 };
 
 
@@ -27,7 +27,11 @@ export default function ScanChooser(props: ScanProps) {
           onInputChange={(_event, newInputValue) => {
             props.setFilename(newInputValue);
           }}
-          onChange={props.load}
+          onChange={(_e, value) => {
+            console.log('ScanChooser onChange', value)
+            props.setFilename(String(value))
+            props.load({filename: String(value)})
+          }}
           renderInput={(params: object) => (
             <TextField
               {...params}
@@ -47,7 +51,7 @@ export default function ScanChooser(props: ScanProps) {
       </Grid>
 
       <Grid size="grow" display="flex" justifyContent="center" alignItems="center">
-        <Button variant='contained' onClick={props.load} size="medium"  endIcon={<SendIcon />}>
+        <Button variant='contained' onClick={() => props.load({})} size="medium"  endIcon={<SendIcon />}>
           Load Scan
         </Button>
       </Grid>
