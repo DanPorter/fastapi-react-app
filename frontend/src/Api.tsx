@@ -8,6 +8,8 @@ interface apiGet {
   xlabel: string,
   ylabel: string,
   data: object,
+  tree: [],
+  evalOutput: string,
 }
   
 interface apiSenderProps {

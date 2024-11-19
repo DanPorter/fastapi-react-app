@@ -3,8 +3,10 @@ import FolderChooser from './FolderChoice'
 import MetadataTabs from './MetadataFormatTabs';
 import { Plots } from './Plots';
 import AxisChooser from './AxisChoice';
+import EvalAutocomplete from './EvaluateMetadata';
 import ScanChooser from './ScanChoice';
 import apiSender from './Api';
+import { TreeModel } from './MetadataFormatTabs'
 
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid2';
@@ -23,23 +25,18 @@ export function GetHdfMap() {
   const [ydata, setYdata] = useState([]);
   const [xlabel, setXlabel] = useState('');
   const [ylabel, setYlabel] = useState('');
+  const [tree, setTree] = useState<TreeModel[]>([]);
+  const [nameOptions, setNameOptions] = useState<string[]>([])
+  const [argument, setArgument] = useState('metadata')
+  const [evalOutput, setEvalOutput] = useState('')
+
 
   const lastScan = apiSender({
     hostname: '/api/get-last-scan/',
-    inputs: { datadir: datadir, filename: '', format: '', xaxis: '', yaxis: '' },
+    inputs: { datadir: datadir, filename: '', format: '', xaxis: '', yaxis: '', evalArg: ''},
     setter: [(data) => setScanFile(data.response)]
   })
-  // const allScans = apiSender({
-  //   hostname: '/api/get-all-scans/',
-  //   inputs: { datadir: datadir, filename: '', format: '', xaxis: '', yaxis: '' },
-  //   setter: [(data) => setScanFiles(data.list)]
-  // })
-  // const getMetadata = apiSender({
-  //   hostname: '/api/get-scan-format/' ,
-  //   inputs: {datadir: datadir, filename: scanFile, format: format, xaxis: '', yaxis: ''}, 
-  //   setter: [(data) => setResponse(data.response)]
-  // })
-  
+
   const getPlotData = apiSender({
     hostname: '/api/get-scan-data/'  ,
     inputs: {
@@ -47,7 +44,8 @@ export function GetHdfMap() {
       filename: scanFile, 
       format: format, 
       xaxis: xAxis, 
-      yaxis: yAxis
+      yaxis: yAxis,
+      evalArg: argument,
     }, 
     setter: [
       (data) => setResponse(data.response),
@@ -55,14 +53,12 @@ export function GetHdfMap() {
       (data) => setYdata(data.ydata),
       (data) => setXlabel(data.xlabel),
       (data) => setYlabel(data.ylabel),
-      (data) => setAxesOptions(Object.keys(data.data))
+      (data) => setAxesOptions(Object.keys(data.data)),
+      (data) => setTree(data.tree),
+      (data) => setEvalOutput(data.evalOutput),
+      (data) => setNameOptions(Object.keys(data.data))
     ]
   })
- 
-  // function loadData() {
-  //   // getMetadata();
-  //   getPlotData();
-  // }
 
   return (
     <Container maxWidth="xl">
@@ -90,14 +86,26 @@ export function GetHdfMap() {
               yAxis={yAxis}
               setXAxis={setXAxis}
               setYAxis={setYAxis}
+              load={getPlotData}
+            />
+          </Grid>
+
+          <Grid size={12}>
+            <EvalAutocomplete 
+              nameOptions={nameOptions}
+              argument={argument}
+              setArgument={setArgument}
+              load={getPlotData}
+              output={evalOutput}
             />
           </Grid>
         </Grid>
       </Grid>
         
       <Grid size={6}>
-        <MetadataTabs format={format} setFormat={setFormat} markdown={response} setMarkdown={setResponse}/>
+        <h1>{scanFile}</h1>
         <Plots xdata={xdata} xlabel={xlabel} ydata={ydata} ylabel={ylabel} />
+        <MetadataTabs format={format} setFormat={setFormat} markdown={response} tree={tree}/>
       </Grid>
     </Grid>
     </Container>

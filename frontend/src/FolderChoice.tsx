@@ -30,7 +30,6 @@ function TabFolders(props: tabProps) {
         value={props.datadir}
         onChange={(e) => props.setDatadir(e.target.value)}
         onKeyDown={(ev) => {
-          console.log(`Pressed keyCode ${ev.key}`);
           if (ev.key === 'Enter') {
             apiSender({
               hostname: '/api/get-all-scans/',
@@ -67,7 +66,7 @@ function TabVisit(props: tabProps) {
       apiSender({
         hostname: '/api/get-all-scans/',
         // inputs: { datadir: visits[visitName] },
-        inputs: { datadir: visits[visitName], filename: '', format: '', xaxis: '', yaxis: '' },
+        inputs: { datadir: visits[visitName], filename: '', format: '', xaxis: '', yaxis: '',  evalArg: ''},
         setter: [(data) => props.setScans(data.list)]
       })({});
       setInstrument(instrument)

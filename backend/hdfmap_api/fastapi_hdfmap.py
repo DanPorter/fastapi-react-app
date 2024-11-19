@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
 
-from .functions import list_scan_files, get_latest_file, get_dls_visits
+from .functions import list_scan_files, get_latest_file, get_dls_visits, hdf_tree_dict
 
 
 app = FastAPI()
@@ -24,6 +24,7 @@ class GetScan(BaseModel):
     format: str
     xaxis: str 
     yaxis: str
+    evalArg: str
 
 # mutable memory
 VISITS = {}
@@ -84,7 +85,9 @@ async def get_scan_data(message: GetScan):
         'ydata': [],
         'xlabel': '',
         'ylabel': '',
-        'data': {}
+        'data': {},
+        'tree': {},
+        'evalOutput': 'filename',
     }
     if os.path.isfile(scan_file):
         nxmap = hdfmap.create_nexus_map(scan_file)
@@ -104,6 +107,7 @@ async def get_scan_data(message: GetScan):
                 signal_data = nxmap.eval(hdf, signal_name)
                 scan_data = nxmap.get_scannables(hdf)
                 rsp = nxmap.format_hdf(hdf, message.format)
+                eval_output = nxmap.eval(hdf, message.evalArg)
             
             if not issubclass(type(axes_data), np.ndarray) or not np.issubdtype(axes_data.dtype, np.number) or np.size(axes_data) != nxmap.scannables_length():
                 axes_name = '![fail]' + axes_name
@@ -113,12 +117,14 @@ async def get_scan_data(message: GetScan):
                 signal_data = np.ones(nxmap.scannables_length())
 
             response['data'] = {name: array.tolist() for name, array in scan_data.items()}
+            response['tree'] = hdf_tree_dict(scan_file)
             response['xlabel'] = axes_name
             response['ylabel'] = signal_name
             response['xdata'] = axes_data.tolist()
             response['ydata'] = signal_data.tolist()
             # response['response'] = f"x={axes_name}, y={signal_name}, scan length={len(scan_data[signal_name])}"
             response['response'] = rsp
+            response['evalOutput'] = str(eval_output)
         except Exception as ex:
             response['response'] = str(ex)
     else:

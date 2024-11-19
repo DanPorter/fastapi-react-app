@@ -74,17 +74,32 @@ def hdf_tree_dict(hdf_filename: str) -> dict:
     :return: {'entry': {'dataset': 'value'}...}
     """
 
-    def store(hdf_dict: dict, hdf_group: Group) -> dict:
+    def TreeViewGroup(key: str, label: str) -> dict:
+        return {'id': key, 'label': label, 'children': []}
+    
+    def TreeViewItem(key: str, label: str) -> dict:
+        return {'id': key, 'label': label}
+    
+    unique_ids = []
+
+    def store(hdf_group: Group, itemslist: list):
         for key in hdf_group:
             obj = hdf_group.get(key)
             link = hdf_group.get(key, getlink=True)
             if obj is None:
-                hdf_dict[key] = '! Missing'
                 continue  # dataset may be missing due to a broken link
+            id = obj.name
+            while id in unique_ids:
+                id += '#1'
+            unique_ids.append(id)
             # Group
             if isinstance(obj, Group):
-                hdf_dict[key] = {f"@{attr}": str(val) for attr, val in obj.attrs.items()}
-                store(hdf_dict[key], obj)
+                item = TreeViewGroup(id, key)
+                for attr, val in obj.attrs.items():
+                    attr_id = f"{id}@{attr}"
+                    attr_label = f"@{attr}: {str(val)}"
+                    item['children'].append(TreeViewItem(attr_id, attr_label))
+                store(obj, item['children'])
             # Dataset
             elif isinstance(obj, Dataset):
                 if obj.size <= 1:
@@ -92,7 +107,10 @@ def hdf_tree_dict(hdf_filename: str) -> dict:
                 else:
                     detail = f"{obj.dtype}, {obj.shape}"
                 if isinstance(link, (SoftLink, ExternalLink)):
-                    detail = f"LINK: " + detail
-                hdf_dict[key] = detail
-        return hdf_dict
-    return store({}, hdfmap.load_hdf(hdf_filename))
+                    detail = f"LINK('{link.filename}'): " + detail
+                item = TreeViewItem(id, f"{key}: {detail}")
+            itemslist.append(item)
+    
+    items = []
+    store(hdfmap.load_hdf(hdf_filename), items)
+    return items
