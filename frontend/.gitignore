@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Byte-compiled / optimized / DLL files
+backend/__pycache__/
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

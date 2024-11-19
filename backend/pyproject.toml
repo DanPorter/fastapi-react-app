@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools >= 61.0", "wheel", "pytest"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hdfmap_api"
+version = "0.1.0"
+dependencies = [
+  "fastapi[standard]",
+  "hdfmap",
+]
+requires-python = ">=3.10"
+authors = [
+  {name = "Dan Porter", email = "dan.porter@diamond.ac.uk"},
+]
+maintainers = [
+  {name = "Dan Porter", email = "dan.porter@diamond.ac.uk"},
+]
+description = "FastAPI webapp backend server using hdfmap"
+readme = "README.md"
+
