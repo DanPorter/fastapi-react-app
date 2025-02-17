@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid2';
 import Box from '@mui/material/Box';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 
@@ -34,7 +35,7 @@ function TabFolders(props: tabProps) {
             apiSender({
               hostname: '/api/get-all-scans/',
               // inputs: { datadir: props.datadir},
-              inputs: { datadir: props.datadir, filename: '', format: '', xaxis: '', yaxis: '' },
+              inputs: { datadir: props.datadir, filename: '', format: '', xaxis: '', yaxis: '', evalArg: ''},
               setter: [(data) => props.setScans(data.list)]
             })({});
             // props.getScans();
@@ -43,6 +44,16 @@ function TabFolders(props: tabProps) {
         }
       }
       />
+      {/* @ts-expect-error
+      <input type="file" id="ctrl" webkitdirectory="" directory multiple/> */}
+      <Button variant='contained' onClick={() => {
+        apiSender({
+          hostname: '/api/start_notebook/',
+          // inputs: { datadir: props.datadir},
+          inputs: { },
+          setter: []
+        })({});
+      }} size="medium"/>
     </Grid>
     </div>
   )

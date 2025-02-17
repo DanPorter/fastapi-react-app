@@ -132,6 +132,16 @@ async def get_scan_data(message: GetScan):
     logger.debug(response['response'])
     return response
 
+@app.post("/api/start_notebook/")
+async def start_notebook(message: GetScan):
+    logger.info('start notebook')
+    import subprocess
+    subprocess.run('jupyter notebook', shell=True)
+
+    rsp = 'OK'
+    logger.debug(f"Response: {rsp}")
+    return {"response": rsp}
+
 
 # Create entry-point for frontend website
 # Mounts the `static` folder within the `build` folder to the `/static` route.
