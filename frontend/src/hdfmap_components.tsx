@@ -2,6 +2,7 @@ import { useState } from 'react';
 import FolderChooser from './FolderChoice'
 import MetadataTabs from './MetadataFormatTabs';
 import { Plots } from './Plots';
+import { DvDPlots } from './DavidiaPlots';
 import AxisChooser from './AxisChoice';
 import EvalAutocomplete from './EvaluateMetadata';
 import ScanChooser from './ScanChoice';
@@ -104,6 +105,7 @@ export function GetHdfMap() {
         
       <Grid size={6}>
         <h1>{scanFile}</h1>
+        <DvDPlots />
         <Plots xdata={xdata} xlabel={xlabel} ydata={ydata} ylabel={ylabel} />
         <MetadataTabs format={format} setFormat={setFormat} markdown={response} tree={tree}/>
       </Grid>

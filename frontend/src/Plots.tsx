@@ -69,6 +69,7 @@ interface PlotProps {
 }
 
 export function Plots(props: PlotProps) {
+  console.log(props)
   return ( 
     <>
       <LineChart

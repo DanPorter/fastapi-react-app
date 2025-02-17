@@ -13,6 +13,14 @@ build frontend:
 $ pnpm build 
 
 
+Installing ndarray
+$ cd frontend
+$ pnpm install ndarray
+$ pnpm install @types/ndarray
+
+Installing Davidia
+$ cd frontend
+$ pnpm add @diamondlightsource/davidia 
 
 
 Installation on linux 16/Oct/24
